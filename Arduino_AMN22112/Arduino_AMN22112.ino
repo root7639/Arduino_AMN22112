@@ -11,8 +11,13 @@
 
 #include <FIRFilter.h>
 
-int HIGH_LED = 2;
-int LOW_LED = 3;
+int interval = 50;
+
+int HIGH_LED = 2; //red
+int LOW_LED = 3; //blue
+
+int motionSensor = 0;
+int motionSensorBefore = 0;
 
 //degital filter by degital filter design services
 const double a[] = {
@@ -37,15 +42,14 @@ void setup() {
 
 void loop() {
   
-  int motionSensor;
   motionSensor = analogRead(A0);
   motionSensor = fir.filter(motionSensor); //Apply FIRFilter
   
-  Serial.println(motionSensor);
+  //Serial.println(motionSensor);
 
   //make vertical line per one sec
-  Serial.print(millis()/1000%2*1600);
-  Serial.print(",");
+  //Serial.print(millis()/1000%2*1600);
+  //Serial.print(",");
 
   if (motionSensor > 600){
     digitalWrite(HIGH_LED, HIGH);
@@ -58,7 +62,19 @@ void loop() {
   } else {
     digitalWrite(LOW_LED, LOW);
   }
+
+  //motion sensor's gragh tilt
+  int sensorTilt = (motionSensor - motionSensorBefore) / 5;
+
+  Serial.println(sensorTilt);
   
-  delay(50);
+  if (motionSensor > 600 || motionSensor < 300){
+    //process when detected motion peak
+    return;
+  }
+  
+  delay(interval);
+
+  motionSensorBefore = motionSensor;
   
 }
