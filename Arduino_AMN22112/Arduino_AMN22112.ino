@@ -13,11 +13,13 @@
 
 int interval = 50;
 
-int HIGH_LED = 2; //red
+int HIGH_LED = 13; //red
 int LOW_LED = 3; //blue
 
 int motionSensor = 0;
 int motionSensorBefore = 0;
+int sensorTilt = 0;
+int sensorTiltBefore = 0;
 
 //degital filter by degital filter design services
 const double a[] = {
@@ -33,17 +35,38 @@ const double a[] = {
 //FIRFilter
 FIRFilter fir(a); 
 
+int person = 0;
+int sensorTiltNum = 0;
+
+int motionTilt[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+/*
+ * motion[]
+ * plus = 2
+ * minus = 1
+ * zero = 0
+ */
+
+void updateMotionSensor () {
+  motionSensorBefore = motionSensor;
+  sensorTiltBefore = sensorTilt;
+  motionSensor = analogRead(A0);
+  motionSensor = fir.filter(motionSensor);
+  sensorTilt = (motionSensor - motionSensorBefore) / 5;
+  delay(interval);
+}
+
 void setup() {
   Serial.begin(9600);
 
   pinMode(HIGH_LED, OUTPUT);
   pinMode(LOW_LED, OUTPUT);
+
 }
 
 void loop() {
   
-  motionSensor = analogRead(A0);
-  motionSensor = fir.filter(motionSensor); //Apply FIRFilter
+  updateMotionSensor();
   
   //Serial.println(motionSensor);
 
@@ -51,6 +74,7 @@ void loop() {
   //Serial.print(millis()/1000%2*1600);
   //Serial.print(",");
 
+  /*
   if (motionSensor > 600){
     digitalWrite(HIGH_LED, HIGH);
   } else {
@@ -62,19 +86,66 @@ void loop() {
   } else {
     digitalWrite(LOW_LED, LOW);
   }
+  */
 
   //motion sensor's gragh tilt
-  int sensorTilt = (motionSensor - motionSensorBefore) / 5;
+  //int sensorTilt = (motionSensor - motionSensorBefore) / 5;
 
-  Serial.println(sensorTilt);
-  
+  //Serial.println(sensorTilt);
+
+  /*
   if (motionSensor > 600 || motionSensor < 300){
     //process when detected motion peak
     return;
   }
-  
-  delay(interval);
+  */
 
-  motionSensorBefore = motionSensor;
+  if (sensorTilt != 0) {
+
+    for (int i = 0; i < 10; i++) {
+      
+      if (sensorTilt > 0) {
+        motionTilt[i] = 2;
+        
+      } else if (sensorTilt < 0) {
+        motionTilt[i] = 1;
+        
+      } else {
+        
+        for (int j = 0; j < 10; j++) {
+          updateMotionSensor();
+          if (sensorTilt == 0){
+            sensorTiltNum++;
+          }
+        }
+        if (sensorTiltNum > 7){
+          break;
+        }
+        
+      }
+
+      updateMotionSensor();
+
+      int loopNum = 0;
+      while ((sensorTiltBefore >= 0) == (sensorTilt >= 0)){
+        updateMotionSensor();
+        loopNum++;
+        if (loopNum > 10) {
+          break;
+        }
+      }
+    }
+
+    for (int i = 0; i < 10; i++) {
+      Serial.print(motionTilt[i]);
+      motionTilt[i] = 0;
+    }
+    Serial.println(";");
+  }
+  sensorTiltNum = 0;
   
 }
+
+
+
+//time person passing is about 4000ms
