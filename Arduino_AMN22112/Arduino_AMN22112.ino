@@ -38,7 +38,7 @@ FIRFilter fir(a);
 int person = 0;
 int sensorTiltNum = 0;
 
-int motionTilt[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int motionTilt[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 /*
  * motion[]
@@ -136,7 +136,39 @@ void loop() {
       }
     }
 
-    for (int i = 0; i < 10; i++) {
+    int sameCount = 1;
+
+    //remove zero signal
+    while (sameCount){
+      sameCount = 0;
+      for (int i = 0; i < 10; i++) {
+        if (motionTilt[i] == 0) {
+          for (int j = i; j < 10; j++){
+            motionTilt[j] = motionTilt[j+1];
+          }
+          if (motionTilt[i] != 0){
+            sameCount = 1;
+          }
+        }
+      }
+    }
+
+    /*
+    //remove same signal
+    for (int i = 1; i < 11; i++) {
+      if (motionTilt[i-1] == motionTilt[i]){
+        for (int j = i; j < 10; j++){
+          motionTilt[j-1] = motionTilt[j];
+        }
+        i--;
+      }
+      if (motionTilt[i] == 0){
+        break;
+      }
+    }
+    */
+
+    for (int i = 1; i < 10; i++) {
       Serial.print(motionTilt[i]);
       motionTilt[i] = 0;
     }
