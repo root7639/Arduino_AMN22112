@@ -145,9 +145,9 @@ void loop() {
         if (motionTilt[i] == 0) {
           for (int j = i; j < 10; j++){
             motionTilt[j] = motionTilt[j+1];
-          }
-          if (motionTilt[i] != 0){
-            sameCount = 1;
+            if (motionTilt[j] != 0) {
+              sameCount = 1;
+            }
           }
         }
       }
@@ -168,7 +168,7 @@ void loop() {
     }
     */
 
-    for (int i = 1; i < 10; i++) {
+    for (int i = 0; i < 10; i++) {
       Serial.print(motionTilt[i]);
       motionTilt[i] = 0;
     }
