@@ -14,7 +14,8 @@
 int interval = 50;
 
 int HIGH_LED = 13; //red
-int LOW_LED = 3; //blue
+int LOW_LED = 2; //blue
+int SOUND = 3;
 
 int motionSensor = 0;
 int motionSensorBefore = 0;
@@ -61,6 +62,7 @@ void setup() {
 
   pinMode(HIGH_LED, OUTPUT);
   pinMode(LOW_LED, OUTPUT);
+  pinMode(SOUND, OUTPUT);
 
 }
 
@@ -170,11 +172,29 @@ void loop() {
       }
     }
 
+    int exNumber = 0;
+    for (int i = 0; i < 10; i++){
+      if (motionTilt[i] != 0){
+        exNumber++;
+      }
+    }
+
+    if (exNumber <= 4){
+      digitalWrite(LOW_LED, HIGH);
+      delay(interval);
+      digitalWrite(LOW_LED, LOW);
+    } else {
+      digitalWrite(SOUND, HIGH);
+      delay(interval);
+      digitalWrite(SOUND, LOW);
+    }
+    
     for (int i = 0; i < 10; i++) {
       Serial.print(motionTilt[i]);
       motionTilt[i] = 0;
     }
     Serial.println(";");
+
   }
   sensorTiltNum = 0;
   
