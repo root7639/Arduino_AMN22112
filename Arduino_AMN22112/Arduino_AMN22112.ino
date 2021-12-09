@@ -118,7 +118,8 @@ void loop() {
             sensorTiltNum++;
           }
         }
-        if (sensorTiltNum > 7){
+        
+        if (sensorTiltNum > 9){
           break;
         }
         
@@ -153,20 +154,21 @@ void loop() {
       }
     }
 
-    /*
-    //remove same signal
-    for (int i = 1; i < 11; i++) {
-      if (motionTilt[i-1] == motionTilt[i]){
-        for (int j = i; j < 10; j++){
-          motionTilt[j-1] = motionTilt[j];
+    sameCount = 1;
+
+    while (sameCount) {
+      sameCount = 0;
+      for (int i = 0; i < 10; i++){
+        if (motionTilt[i] == motionTilt[i+1]){
+          for (int j = i; j < 10; j++){
+            motionTilt[j] = motionTilt[j+1];
+            if (motionTilt[j] != 0){
+              sameCount = 1;
+            }
+          }
         }
-        i--;
-      }
-      if (motionTilt[i] == 0){
-        break;
       }
     }
-    */
 
     for (int i = 0; i < 10; i++) {
       Serial.print(motionTilt[i]);
