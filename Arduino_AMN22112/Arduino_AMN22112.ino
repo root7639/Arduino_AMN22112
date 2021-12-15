@@ -16,6 +16,7 @@ int interval = 50;
 int HIGH_LED = 13; //red
 int LOW_LED = 2; //blue
 int SOUND = 3;
+int SENSOR_OUTPUT = 4;
 
 int motionSensor = 0;
 int motionSensorBefore = 0;
@@ -63,12 +64,16 @@ void setup() {
   pinMode(HIGH_LED, OUTPUT);
   pinMode(LOW_LED, OUTPUT);
   pinMode(SOUND, OUTPUT);
+  pinMode(SENSOR_OUTPUT, OUTPUT);
+
+  pinMode(A5, OUTPUT);
 
 }
 
 void loop() {
   
   updateMotionSensor();
+  digitalWrite(A5, 0);
   
   //Serial.println(motionSensor);
 
@@ -179,10 +184,19 @@ void loop() {
       }
     }
 
+    if (exNumber <= 1) {
+      return;
+    }
+
     if (exNumber <= 4){
       digitalWrite(LOW_LED, HIGH);
       delay(interval);
       digitalWrite(LOW_LED, LOW);
+      
+      digitalWrite(A5, 1);
+      delay(100);
+      digitalWrite(A5, 0);
+      
     } else {
       digitalWrite(SOUND, HIGH);
       delay(interval);
@@ -199,6 +213,8 @@ void loop() {
   sensorTiltNum = 0;
   
 }
+
+//one person 43/50 success
 
 
 
